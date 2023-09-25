@@ -1,28 +1,28 @@
 import { useSelector } from 'react-redux';
+
 import { ContactItem } from '../ContactItem/ContactItem';
-import { ContactListStyled } from './ContactList.styled';
-import { getContacts } from 'redux/selectors';
-import { ContactItemStyled } from 'components/ContactItem/ContactItem.styled';
+import { getContacts, getFilter } from 'redux/selectors';
+import { ContactListStyled, ContactItemStyled } from './ContactList.styled';
 
 export const ContactList = () => {
   const contacts = useSelector(getContacts);
-  // const filter = useSelector(getFilter);
-  // const dispatch = useDispatch();
+  const filter = useSelector(getFilter);
 
-  // const isContact = contacts.filter(contact =>
-  //   contact.name.toLowerCase().includes(filter.toLowerCase())
-  // );
+  const stateContacts = contacts.filter(contact =>
+    contact.name.toLowerCase().includes(filter.toLowerCase())
+  );
 
-  // console.log('contacts.id', contacts[0].id);
   return (
     <ContactListStyled>
-      {contacts.length > 0
-        ? contacts.map(contact => (
-            <ContactItemStyled key={contact.id}>
-              <ContactItem contact={contact} />
-            </ContactItemStyled>
-          ))
-        : 'There is not contacts'}
+      {stateContacts.length > 0 ? (
+        stateContacts.map(contact => (
+          <ContactItemStyled key={contact.id}>
+            <ContactItem contact={contact} />
+          </ContactItemStyled>
+        ))
+      ) : (
+        <ContactItemStyled>There is not contacts</ContactItemStyled>
+      )}
     </ContactListStyled>
   );
 };

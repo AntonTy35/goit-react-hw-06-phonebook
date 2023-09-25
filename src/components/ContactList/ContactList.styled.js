@@ -6,3 +6,8 @@ export const ContactListStyled = styled.ul`
   gap: 10px;
   width: 300px;
 `;
+
+export const ContactItemStyled = styled.li`
+  display: flex;
+  justify-content: space-around;
+`;

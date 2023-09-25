@@ -1,22 +1,28 @@
+import { nanoid } from '@reduxjs/toolkit';
 import { ErrorMessage, Formik, Field, Form } from 'formik';
-import * as Yup from 'yup';
 import styled from 'styled-components';
+import * as Yup from 'yup';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import { Label, ButtonSubmit } from './ContactForm.styled';
 import { addContact } from 'redux/contactsSlice';
-import { useDispatch } from 'react-redux';
-
-import { nanoid } from '@reduxjs/toolkit';
+import { useDispatch, useSelector } from 'react-redux';
+import { getContacts } from 'redux/selectors';
 
 const schema = Yup.object().shape({
   name: Yup.string()
-    .matches(/^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$/)
+    .matches(
+      /^[a-zA-Za-яА-Я]+(([' -][a-zA-Za-яА-Я ])?[a-zA-Za-яА-Я]*)*$/,
+      'Invalid name format'
+    )
     .required('Required!')
     .min(2, 'Too Short!')
     .max(20, 'Too Long!'),
   number: Yup.string()
     .matches(
-      /\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}/
+      /\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}/,
+      'Invalid phone number format'
     )
     .required('Required!')
     .min(2, 'Too Short!')
@@ -33,7 +39,18 @@ const FormStyled = styled(Form)`
 `;
 
 export const ContactForm = () => {
+  const contacts = useSelector(getContacts);
   const dispatch = useDispatch();
+
+  const handleAddContact = value => {
+    const isContact = contacts.find(contact => {
+      return contact.name === value.name || contact.number === value.number;
+    });
+
+    isContact
+      ? toast.error(`This name or number is already in contacts.`)
+      : dispatch(addContact({ id: nanoid(), ...value }));
+  };
 
   return (
     <Formik
@@ -43,7 +60,7 @@ export const ContactForm = () => {
       }}
       validationSchema={schema}
       onSubmit={(values, actions) => {
-        dispatch(addContact({ id: nanoid(), ...values }));
+        handleAddContact(values);
         actions.resetForm();
       }}
     >
